@@ -1,0 +1,42 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-4.0.xsd ">
+	<context:property-placeholder
+		location="file:D:\dbproperties.properties"></context:property-placeholder>
+	<bean id="driverManagerDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>${driver}</value>
+		</property>
+		<property name="url">
+			<value>${url}</value>
+		</property>
+		<property name="username">
+			<value>${user}</value>
+		</property>
+		<property name="password">
+			<value>${password}</value>
+		</property>
+	</bean>
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="driverManagerDataSource"></constructor-arg>
+	</bean>
+	<bean id="employeeDaoImpl"
+		class="com.reactiveworks.jdbctemplate.exp1.EmployeeDaoImpl" autowire="constructor">
+	</bean>
+	<bean id="employee"
+		class="com.reactiveworks.jdbctemplate.exp1.Employee">
+		<property name="id" value="101"></property>
+		<property name="name" value="bob"></property>
+		<property name="salary" value="20000"></property>
+	</bean>
+		<bean id="employeeMapper"
+		class="com.reactiveworks.jdbctemplate.exp1.EmployeeMapper" autowire="byType">
+	</bean>
+</beans>

@@ -1,0 +1,66 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans-4.0.xsd 
+   http://www.springframework.org/schema/aop 
+   http://www.springframework.org/schema/aop/spring-aop-3.0.xsd 
+   http://www.springframework.org/schema/tx
+   http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context-4.0.xsd ">
+ <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+	<context:property-placeholder
+		location="file:D:\dbproperties.properties"></context:property-placeholder>
+
+	<aop:config proxy-target-class="true">
+		<aop:advisor advice-ref="transactionAdvice"
+			pointcut="execution(* com.reactiveworks.transaction.exp2.EmployeeDaoImpl.add*(..))" />
+	</aop:config>
+	<tx:advice id="transactionAdvice">
+		<tx:attributes>
+			<tx:method name="addEmployee" isolation="READ_COMMITTED"
+				read-only="true" propagation="REQUIRED"
+				rollback-for="com.reactiveworks.transaction.exp2.UnableToPerformTheOperation" />
+		</tx:attributes>
+	</tx:advice>
+
+	<bean id="driverManagerDataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName">
+			<value>${driver}</value>
+		</property>
+		<property name="url">
+			<value>${url}</value>
+		</property>
+		<property name="username">
+			<value>${user}</value>
+		</property>
+		<property name="password">
+			<value>${password}</value>
+		</property>
+	</bean>
+
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.JdbcTemplate">
+		<constructor-arg ref="driverManagerDataSource"></constructor-arg>
+	</bean>
+	<bean
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		id="transactionManager">
+		<property name="dataSource" ref="driverManagerDataSource"></property>
+	</bean>
+	<bean id="employeeDaoImpl"
+		class="com.reactiveworks.transaction.exp2.EmployeeDaoImpl">
+		<constructor-arg ref="jdbcTemplate"></constructor-arg>
+	</bean>
+	<bean id="employee"
+		class="com.reactiveworks.transaction.exp2.Employee">
+		<property name="id" value="1013"></property>
+		<property name="name" value="bob"></property>
+		<property name="salary" value="20000"></property>
+	</bean>
+</beans>
